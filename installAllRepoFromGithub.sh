@@ -29,6 +29,9 @@ cat pure.txt
 # ------------------------------------------------- #
 # Finally we download all repos with git clone      #
 # --------------------------------------------------#
-
+for f in `cat pure.txt`
+do
+    git clone $f
+done
 
 
