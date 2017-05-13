@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Profile Page: https://github.com/pleycpl
+# Organization Page: https://github.com/ProjemVar
 
 # ------------------------------------------------- #
 # We are downloading source code in link.           #
