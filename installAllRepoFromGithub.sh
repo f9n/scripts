@@ -57,7 +57,8 @@ downloadRepos() {
 }
 
 Main() {
-    downloadLinks 2
+    read -p "Entry your github repository page size: " size
+    downloadLinks $size
     cleanLinks
     addedProtocolAndHostname
     downloadRepos
