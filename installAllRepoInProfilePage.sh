@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Profile Page: https://github.com/pleycpl
+
 # ------------------------------------------------- #
 # We are downloading source code in link.           #
 # And created allAtags.txt.                         #
@@ -7,8 +9,8 @@
 downloadLinks() {
     echo -e "[+] Starting downloadLinks function"
     github="https://github.com"
-    username="pleycpl"
-    pageSize=$1
+    username=$1
+    pageSize=$2
     touch allAtags.txt
     for page in $(seq ${pageSize})
     do
@@ -57,8 +59,9 @@ downloadRepos() {
 }
 
 Main() {
+    read -p "Entry your github profile name: " profileName
     read -p "Entry your github repository page size: " size
-    downloadLinks $size
+    downloadLinks $profileName $size
     cleanLinks
     addedProtocolAndHostname
     downloadRepos
