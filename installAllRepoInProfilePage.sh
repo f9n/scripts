@@ -58,14 +58,27 @@ downloadRepos() {
     done
 }
 
+# ------------------------------------------------- #
+# Removing unnecessary files                        #
+# ------------------------------------------------- #
+cleanUpTempFiles() {
+    rm allAtags.txt pureLinks.txt pure.txt
+}
+
+# ------------------------------------------------- #
+# Main Section in Script                            #
+# ------------------------------------------------- #
 Main() {
     read -p "Entry your github profile name: " profileName
     read -p "Entry your github repository page size: " size
+    read -p "Entry the program mode[debug|normal]: " mode
     downloadLinks $profileName $size
     cleanLinks
     addedProtocolAndHostname
     downloadRepos
+    if [ $mode == "normal" ]; then
+        cleanUpTempFiles
+    fi
 }
 
 Main
-
