@@ -25,3 +25,6 @@
 # $ genpm remove <pkg_name>                   #
 # $ genpm search <search_string>              #
 # ------------------------------------------- #
+
+OS=$(lsb_release -a | awk '{if (NR==2) print $3}')
+echo $OS
