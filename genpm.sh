@@ -27,34 +27,24 @@
 # ------------------------------------------- #
 
 ##########    Genpm Code Section ##############
-
-# Functions Section
-function check_package {
-  # $1 is package name
-  if ! which $1 > /dev/null 2>&1; then
-    # Package is not exists.
-    missing_packages[$index]="$1"
-    index=$index+1
-  fi
+# https://unix.stackexchange.com/questions/6345/how-can-i-get-distribution-name-and-version-number-in-a-simple-shell-script
+function available_package_management_tools {
+  index=0
+  case `uname` in
+    Linux )
+       which apt-get  > /dev/null 2>&1 && { pm[$index]="apt-get" ; index=$index+1; }
+       which pacman   > /dev/null 2>&1 && { pm[$index]="pacman"  ; index=$index+1; }
+       which dnf      > /dev/null 2>&1 && { pm[$index]="dnf"     ; index=$index+1; }
+       which yum      > /dev/null 2>&1 && { pm[$index]="yum"     ; index=$index+1; }
+       ;;
+    Darwin )
+       ;;
+    * )
+       # Handle AmgiaOS, CPM, and modified cable modems here.
+       ;;
+  esac
 }
 
-function checking_necessary_packages {
-  for package in "${necessary_packages[@]}"
-  do
-    check_package $package
-  done
-
-  if [ -z "$missing_packages" ]; then
-    echo "Everything is okey."
-  else
-    echo "You should install this packages:" ${missing_packages[*]}
-  fi
-}
-
-# Main Section
-index=0
-missing_packages=("")
-necessary_packages=("lsb_releaseA" "Aawk")
-checking_necessary_packages
-OS=$(lsb_release -a | awk '{if (NR==2) print $3}')
-echo $OS
+pm=("")
+available_package_management_tools
+echo $pm
