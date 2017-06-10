@@ -27,15 +27,16 @@
 # ------------------------------------------- #
 
 ##########    Genpm Code Section ##############
+# Functions Section
 # https://unix.stackexchange.com/questions/6345/how-can-i-get-distribution-name-and-version-number-in-a-simple-shell-script
 function available_package_management_tools {
   index=0
   case `uname` in
     Linux )
-       which apt-get  > /dev/null 2>&1 && { pm[$index]="apt-get" ; index=$index+1; }
-       which pacman   > /dev/null 2>&1 && { pm[$index]="pacman"  ; index=$index+1; }
-       which dnf      > /dev/null 2>&1 && { pm[$index]="dnf"     ; index=$index+1; }
-       which yum      > /dev/null 2>&1 && { pm[$index]="yum"     ; index=$index+1; }
+       which apt-get  > /dev/null 2>&1 && { PMS[$index]="aptget"  ; index=$index+1; }
+       which pacman   > /dev/null 2>&1 && { PMS[$index]="pacman"  ; index=$index+1; }
+       which dnf      > /dev/null 2>&1 && { PMS[$index]="dnf"     ; index=$index+1; }
+       which yum      > /dev/null 2>&1 && { PMS[$index]="yum"     ; index=$index+1; }
        ;;
     Darwin )
        ;;
@@ -46,34 +47,29 @@ function available_package_management_tools {
 }
 
 function reload_genpmrc {
-  touch $file
+  touch $FILEPATH
   available_package_management_tools
-  echo $pm > $file
+  echo $PMS > $FILEPATH
 }
 
 function check_genpmrc {
-  if [ ! -f "$file" ]
+  if [ ! -f "$FILEPATH" ]
   then
     echo "Created .genpmrc file!"
     reload_genpmrc
   fi
 }
 
-pm=("")
-file="/home/$(echo ${USER})/.genpmrc"
-check_genpmrc
-tool=`cat ${file}`
-echo $tool
-case $1 in
-  "install" )
-    echo "Install package"
-    ;;
-  "remove" )
-    echo "Remove package"
-    ;;
-  "search" )
-    echo "Search package"
-    ;;
-  * )
-    ;;
-esac
+FILEPATH="/home/$(echo ${USER})/.genpmrc"
+PMS=("")        # All package management tools in current os
+if [ "$1" == "" ] || [ "$2" == "" ]; then
+  echo "Please insert at less two arguman, like: genpm install <package_name>"
+  exit 1
+fi
+ARGUMAN=$1      # Like install, remove, search
+PACKAGENAME=$2  # Like awk, sed
+check_genpmrc   # .genpmrc file is exist?
+TOOL=$(cat ${FILEPATH} | sed -e 's/ //g')
+echo $TOOL
+echo $ARGUMAN
+$ARGUMAN        # Runned ARGUMAN name function
