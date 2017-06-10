@@ -72,8 +72,13 @@ function remove {
   echo "Remove package"
 }
 
+# Main Section
+#       Install[0]          Search[1]           Remove[2]
+PACMAN=("pacman -S"         "pacman -Ss"        "pacman -R")
+APTGET=("apt-get install"   "apt-cache search"  "apt-get remove")
 FILEPATH="/home/$(echo ${USER})/.genpmrc"
 PMS=("")        # All package management tools in current os
+
 if [ "$1" == "" ] || [ "$2" == "" ]; then
   echo "Please insert at less two arguman, like: genpm install <package_name>"
   exit 1
