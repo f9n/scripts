@@ -43,12 +43,17 @@ function checking_necessary_packages {
   do
     check_package $package
   done
-  echo ${missing_packages[*]}
+
+  if [ -z "$missing_packages" ]; then
+    echo "Everything is okey."
+  else
+    echo "You should install this packages:" ${missing_packages[*]}
+  fi
 }
 
 # Main Section
 index=0
-missing_packages[$index]=""
+missing_packages=("")
 necessary_packages=("lsb_releaseA" "Aawk")
 checking_necessary_packages
 OS=$(lsb_release -a | awk '{if (NR==2) print $3}')
