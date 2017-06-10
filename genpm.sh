@@ -26,18 +26,22 @@
 # $ genpm search <search_string>              #
 # ------------------------------------------- #
 
+function check_package {
+  # $1 is package name, $2 is array name, $3 is index
+  if ! which $1 > /dev/null 2>&1; then
+    # Package is not exists.
+    array[$index]="$1"
+    index=$index+1
+  fi
+}
+
 function checking_necessary_packages {
   index=0
+  array[$index]=""
   # Checking lsb_release
-  if ! which lsb_release >/dev/null 2>&1; then
-    array[$index]="lsb_release"
-    index=$index+1
-  fi
+  check_package lsb_release array index
   # Checking awk
-  if ! which awk > /dev/null 2>&1; then
-    array[$index]="awk"
-    index=$index+1
-  fi
+  check_package awk array index
   echo ${array[*]}
 }
 
