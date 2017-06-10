@@ -27,10 +27,18 @@
 # ------------------------------------------- #
 
 function checking_necessary_packages {
+  index=0
   # Checking lsb_release
-  which lsb_release > /dev/null 2>&1 || { echo "We require lsb_release but it's not installed."; exit 1; }
+  if ! which lsb_release >/dev/null 2>&1; then
+    array[$index]="lsb_release"
+    index=$index+1
+  fi
   # Checking awk
-  which awk > /dev/null 2>&1 || { echo "We require awk but it's not installed."; exit 1; }
+  if ! which awk > /dev/null 2>&1; then
+    array[$index]="awk"
+    index=$index+1
+  fi
+  echo ${array[*]}
 }
 
 checking_necessary_packages
