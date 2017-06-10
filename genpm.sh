@@ -26,26 +26,30 @@
 # $ genpm search <search_string>              #
 # ------------------------------------------- #
 
+##########    Genpm Code Section ##############
+
+# Functions Section
 function check_package {
-  # $1 is package name, $2 is array name, $3 is index
+  # $1 is package name
   if ! which $1 > /dev/null 2>&1; then
     # Package is not exists.
-    array[$index]="$1"
+    missing_packages[$index]="$1"
     index=$index+1
   fi
 }
 
 function checking_necessary_packages {
-  index=0
-  array[$index]=""
-  packages=("lsb_releaseA" "Aawk")
-  for package in "${packages[@]}"
+  for package in "${necessary_packages[@]}"
   do
-    check_package $package array index
+    check_package $package
   done
-  echo ${array[*]}
+  echo ${missing_packages[*]}
 }
 
+# Main Section
+index=0
+missing_packages[$index]=""
+necessary_packages=("lsb_releaseA" "Aawk")
 checking_necessary_packages
 OS=$(lsb_release -a | awk '{if (NR==2) print $3}')
 echo $OS
