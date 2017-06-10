@@ -64,3 +64,16 @@ file="/home/$(echo ${USER})/.genpmrc"
 check_genpmrc
 tool=`cat ${file}`
 echo $tool
+case $1 in
+  "install" )
+    echo "Install package"
+    ;;
+  "remove" )
+    echo "Remove package"
+    ;;
+  "search" )
+    echo "Search package"
+    ;;
+  * )
+    ;;
+esac
