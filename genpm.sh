@@ -60,6 +60,18 @@ function check_genpmrc {
   fi
 }
 
+function install {
+  echo "Install package"
+}
+
+function search {
+  echo "Search package"
+}
+
+function remove {
+  echo "Remove package"
+}
+
 FILEPATH="/home/$(echo ${USER})/.genpmrc"
 PMS=("")        # All package management tools in current os
 if [ "$1" == "" ] || [ "$2" == "" ]; then
