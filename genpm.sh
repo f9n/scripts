@@ -38,10 +38,11 @@ function check_package {
 function checking_necessary_packages {
   index=0
   array[$index]=""
-  # Checking lsb_release
-  check_package lsb_release array index
-  # Checking awk
-  check_package awk array index
+  packages=("lsb_releaseA" "Aawk")
+  for package in "${packages[@]}"
+  do
+    check_package $package array index
+  done
   echo ${array[*]}
 }
 
