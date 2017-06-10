@@ -26,6 +26,10 @@
 # $ genpm search <search_string>              #
 # ------------------------------------------- #
 
+# Checking lsb_release
 which lsb_release > /dev/null 2>&1 || { echo "We require lsb_release but it's not installed."; exit 1; }
+# Checking awk
+which awk > /dev/null 2>&1 || { echo "We require awk but it's not installed."; exit 1; }
+
 OS=$(lsb_release -a | awk '{if (NR==2) print $3}')
 echo $OS
