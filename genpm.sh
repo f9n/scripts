@@ -46,5 +46,13 @@ function available_package_management_tools {
 }
 
 pm=("")
-available_package_management_tools
-echo $pm
+file="/home/$(echo ${USER})/.genpmrc"
+if [ -f "$file" ]
+then
+	echo "$file found."
+else
+  echo "Created .genpmrc file!"
+  touch $file
+  available_package_management_tools
+  echo $pm > $file
+fi
