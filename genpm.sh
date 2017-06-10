@@ -62,6 +62,14 @@ function check_genpmrc {
 
 function install {
   echo "Install package"
+  case $TOOL in
+    "pacman" )
+      sudo ${PACMAN[0]} $PACKAGENAME
+      ;;
+    "aptget" )
+      sudo ${APTGET[0]} $PACKAGENAME
+      ;;
+  esac
 }
 
 function search {
