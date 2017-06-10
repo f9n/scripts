@@ -45,14 +45,22 @@ function available_package_management_tools {
   esac
 }
 
-pm=("")
-file="/home/$(echo ${USER})/.genpmrc"
-if [ -f "$file" ]
-then
-	echo "$file found."
-else
-  echo "Created .genpmrc file!"
+function reload_genpmrc {
   touch $file
   available_package_management_tools
   echo $pm > $file
-fi
+}
+
+function check_genpmrc {
+  if [ ! -f "$file" ]
+  then
+    echo "Created .genpmrc file!"
+    reload_genpmrc
+  fi
+}
+
+pm=("")
+file="/home/$(echo ${USER})/.genpmrc"
+check_genpmrc
+tool=`cat ${file}`
+echo $tool
