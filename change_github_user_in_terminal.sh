@@ -34,5 +34,8 @@ function main {
 }
 
 main $@
-#current_username=$(git config --global user.name)
-#current_email=$(git config --global user.name)
+### Changing prompt, add .zshrc or .bashrc file
+# OLDPS1=$PS1
+# PS1=\($(git config --global user.name)\)$PS1
+
+### Next step, ssl keys
