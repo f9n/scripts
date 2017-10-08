@@ -47,7 +47,16 @@ function read_all_package_path {
         read_downloaded_packages_in_site_packages $Site_Packages_Path packagelist_${python_version}.txt
     done
 }
-
+function install {
+    local package_name=$1
+    local python_version=$2
+    for line in $( awk '{ print NR, $1}' packagelist_${python_version}.txt |\
+                    grep -i $package_name |\
+                    awk '{ print $1 }'); do
+        sed "${line}q;d" packagelist_${python_version}.txt
+        #awk -v n=$line 'NR == n' packagelist_${python_version}.txt
+    done
+}
 function main {
     local python_status=$1 # Like py3 or py2
     local my_venv_path=$2 # Currently, Please insert full path. Like /home/<user_name>/....
@@ -59,6 +68,7 @@ function main {
     echo ${InitialFiles[@]}
     rm packagelist_py2.txt packagelist_py3.txt 2> /dev/null
     read_all_package_path $python_status
+    install $package_name $python_status
 }
 
 main "$@"
