@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 ### Global Variables
 declare -A ALL_SITE_PACKAGES_PATHS=(
-    ["py2"]="python2"
-    ["py3"]="python3"
+    ["py2"]=""
+    ["py3"]=""
 )
 function init() {
     echo "[+] init function"
@@ -16,17 +16,15 @@ function print_site_packages_paths {
     done
 }
 function usage {
-    echo "./main.sh <my_venv_path> <install|remove> <package_name>"
+    echo "./main.sh <py3|py2> <my_venv_path> <install|remove> <package_name>"
 }
 function main {
-    local my_venv_path=$1
-    local status=$2
-    local package_name=$3
+    local python_status=$1 # Like py3 or py2
+    local my_venv_path=$2 # Currently, Please insert full path. Like /home/<user_name>/....
+    local status=$3
+    local package_name=$4 # We must learn sub packages this package_name.
     init
-    print_site_packages_paths py3
-    echo $my_venv_path
-    echo $status
-    echo $package_name
+    print_site_packages_paths $python_status
 }
 
 main "$@"
