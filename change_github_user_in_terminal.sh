@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-declare -A UsersAndEmails
-UsersAndEmails=(
+declare -A UsersAndEmails=(
     ["pleycpl"]="pleycpl@protonmail.com"
     ["example"]="example@gmail.com"
 )
