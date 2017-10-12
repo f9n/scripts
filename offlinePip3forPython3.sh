@@ -64,13 +64,41 @@ function install {
     # installing package
     local package_name=$1
     local python_version=$2
+    local package_dist_info=""
+    local package_dist_info_path=""
     check_is_debug_mode "install() package_name: $package_name python_version: $python_version"
-    for line in $( awk '{ print NR, $1}' $SETUPPATH/packagelist_${python_version}.txt |\
-                    grep -i $package_name |\
+
+    ## packagelist_py3.txt - Content
+    #       ...
+    #       flask /home/<user_name>/venv/lib/python3.6/site-packages/flask
+    #       Flask-0.12.2.dist-info /home/<user_name>/venv/lib/python3.6/site-packages/Flask-0.12.2.dist-info
+    #       flask_mysqldb /home/<user_name>venv/lib/python3.6/site-packages/flask_mysqldb
+    #       Flask_MySQLdb-0.2.0.dist-info /home/<user_name>/venv/lib/python3.6/site-packages/Flask_MySQLdb-0.2.0.dist-info
+    #       ...
+    #       urllib3 /home/<user_name>/venv/lib/python3.6/site-packages/urllib3
+    #       urllib3-1.21.1.dist-info /home/<user_name>/venv/lib/python3.6/site-packages/urllib3-1.21.1.dist-info
+    #       wheel-0.29.0.dist-info /home/<user_name>/venv/lib/python3.6/site-packages/wheel-0.29.0.dist-info
+    #       yarl /home/<user_name>/venv/lib/python3.6/site-packages/yarl
+    #       yarl-0.10.2.dist-info /home/<user_name>/venv/lib/python3.6/site-packages/yarl-0.10.2.dist-info
+    #       ...
+    # First with awk and grep - Content , we are searchin without path, because maybe package_name match path
+    #       5 Flask-0.12.2.dist-info
+    #       159 Flask-0.12.2.dist-info
+    # Again with awk, returning line number
+    #       5
+    #       159
+    # In for loop, with sed. Finding filename and path with lineno. And every line data is adding
+    #       Flask-0.12.2.dist-info /home/<user_name>/github/heyiya/venv/lib/python3.6/site-packages/Flask-0.12.2.dist-info
+    #       Flask-0.12.2.dist-info /home/<user_name>/venv/lib/python3.6/site-packages/Flask-0.12.2.dist-info
+    # After that, we are finding big one.
+    for lineno in $( awk '{ print NR, $1}' $SETUPPATH/packagelist_${python_version}.txt |\
+                    grep -i "$package_name[-_][0-9.]*\.dist-info" |\
                     awk '{ print $1 }'); do
-        sed "${line}q;d" $SETUPPATH/packagelist_${python_version}.txt
-        #awk -v n=$line 'NR == n' $SETUPPATH/packagelist_${python_version}.txt
+        sed "${lineno}q;d" $SETUPPATH/packagelist_${python_version}.txt >> $SETUPPATH/result_package_path.txt
+        #awk -v n=$lineno 'NR == n' $SETUPPATH/packagelist_${python_version}.txt >> $SETUPPATH/result_package_path.txt
     done
+    read -r package_dist_info package_dist_info_path <<< $(cat $SETUPPATH/result_package_path.txt | sort -r | head -n 1)
+    echo $package_dist_info $package_dist_info_path
 }
 function main {
     local python_status=$1  # Like py3 or py2
@@ -93,6 +121,7 @@ function main {
 
 main "$@"
 
+# Python Packages
 # ...../site-packages/<package_name>
 # ...../site-packages/<package_name>-<version>.dist-info
 # flask             Flask-0.12.2.dist-info
