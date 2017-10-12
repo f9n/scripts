@@ -63,7 +63,10 @@ function read_all_package_path {
 
 function get_require_packages() {
     local package_dist_info_path=$1 # Example data: /home/<user_name>venv/lib/python3.6/site-packages/Flask-0.12.2.dist-info
+    # There is metadata.json in every "*dist.info" directory. And metadata.json file keep require packages.
     echo $package_dist_info_path
+    require_packages=$(cat $package_dist_info_path/metadata.json | python3 -c "import sys, json; print(*json.load(sys.stdin)['run_requires'][0]['requires'])")
+    echo $require_packages      # Jinja2 (>=2.4) Werkzeug (>=0.7) click (>=2.0) itsdangerous (>=0.21)
 }
 
 function install {
@@ -115,6 +118,7 @@ function main {
     [[ $debug = "--debug" ]] && IS_DEBUG="TRUE"
     [ ! -e $SETUPPATH ] && mkdir $SETUPPATH && check_is_debug_mode "created $SETUPPATH"
     rm $SETUPPATH/packagelist_py2.txt $SETUPPATH/packagelist_py3.txt 2> /dev/null
+    rm $SETUPPATH/result_package_path.txt
     rm -r $SETUPPATH/venv 2> /dev/null
     
     init
