@@ -37,7 +37,7 @@ function read_init_files {
     # reading virtualenv's init files
     local path=$SETUPPATH/venv/lib/python3*/site-packages
     check_is_debug_mode "read_init_files path: $path"
-    virtualenv $SETUPPATH/venv
+    virtualenv $SETUPPATH/venv > /dev/null 2>&1
     for initial_file in $(ls $path); do
         InitialFiles+=($initial_file)
     done
