@@ -60,6 +60,12 @@ function read_all_package_path {
         read_downloaded_packages_in_site_packages $Site_Packages_Path $SETUPPATH/packagelist_${python_version}.txt
     done
 }
+
+function get_require_packages() {
+    local package_dist_info_path=$1 # Example data: /home/<user_name>venv/lib/python3.6/site-packages/Flask-0.12.2.dist-info
+    echo $package_dist_info_path
+}
+
 function install {
     # installing package
     local package_name=$1
@@ -98,7 +104,7 @@ function install {
         #awk -v n=$lineno 'NR == n' $SETUPPATH/packagelist_${python_version}.txt >> $SETUPPATH/result_package_path.txt
     done
     read -r package_dist_info package_dist_info_path <<< $(cat $SETUPPATH/result_package_path.txt | sort -r | head -n 1)
-    echo $package_dist_info $package_dist_info_path
+    get_require_packages $package_dist_info_path
 }
 function main {
     local python_status=$1  # Like py3 or py2
