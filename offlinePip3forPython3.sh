@@ -6,6 +6,7 @@ declare -A ALL_SITE_PACKAGES_PATHS=(
 )
 declare -a InitialFiles=("")
 IS_DEBUG="FALSE"
+SETUPPATH="$HOME/offlinepip3"
 
 function check_is_debug_mode() {
     local string=$1
@@ -34,9 +35,9 @@ function usage {
 
 function read_init_files {
     # reading virtualenv's init files
-    local path=/tmp/venv/lib/python3*/site-packages
+    local path=$SETUPPATH/venv/lib/python3*/site-packages
     check_is_debug_mode "read_init_files path: $path"
-    virtualenv /tmp/venv
+    virtualenv $SETUPPATH/venv
     for initial_file in $(ls $path); do
         InitialFiles+=($initial_file)
     done
@@ -56,7 +57,7 @@ function read_all_package_path {
     check_is_debug_mode "read_all_package_path, python_version: $python_version"
     for Site_Packages_Path in ${ALL_SITE_PACKAGES_PATHS[$python_version]}; do
         # path of all package in "site_packages" is adding to "packagelist_py2.txt" or "packagelist_py3.txt" file.
-        read_downloaded_packages_in_site_packages $Site_Packages_Path packagelist_${python_version}.txt
+        read_downloaded_packages_in_site_packages $Site_Packages_Path $SETUPPATH/packagelist_${python_version}.txt
     done
 }
 function install {
@@ -64,11 +65,11 @@ function install {
     local package_name=$1
     local python_version=$2
     check_is_debug_mode "install() package_name: $package_name python_version: $python_version"
-    for line in $( awk '{ print NR, $1}' packagelist_${python_version}.txt |\
+    for line in $( awk '{ print NR, $1}' $SETUPPATH/packagelist_${python_version}.txt |\
                     grep -i $package_name |\
                     awk '{ print $1 }'); do
-        sed "${line}q;d" packagelist_${python_version}.txt
-        #awk -v n=$line 'NR == n' packagelist_${python_version}.txt
+        sed "${line}q;d" $SETUPPATH/packagelist_${python_version}.txt
+        #awk -v n=$line 'NR == n' $SETUPPATH/packagelist_${python_version}.txt
     done
 }
 function main {
@@ -78,11 +79,14 @@ function main {
     local package_name=$4   # package_name.
     local debug=$5          # "--debug" or nothing
     [[ $debug = "--debug" ]] && IS_DEBUG="TRUE"
+    [ ! -e $SETUPPATH ] && mkdir $SETUPPATH && check_is_debug_mode "created $SETUPPATH"
+    rm $SETUPPATH/packagelist_py2.txt $SETUPPATH/packagelist_py3.txt 2> /dev/null
+    rm -r $SETUPPATH/venv 2> /dev/null
+    
     init
     print_site_packages_paths $python_status
     read_init_files
     check_is_debug_mode ${InitialFiles[@]}
-    rm packagelist_py2.txt packagelist_py3.txt 2> /dev/null
     read_all_package_path $python_status
     install $package_name $python_status
 }
