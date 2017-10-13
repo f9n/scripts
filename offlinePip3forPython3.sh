@@ -115,6 +115,24 @@ function install {
     read -r package_dist_info package_dist_info_path <<< $(cat $SETUPPATH/result_package_path.txt | sort -r | head -n 1)
     get_require_packages $package_dist_info_path
     echo $REQUIRE_PACKAGES # Jinja2 (>=2.4) Werkzeug (>=0.7) click (>=2.0) itsdangerous (>=0.21)
+    if [[ $REQUIRE_PACKAGES != "" ]]; then
+        local flag=0
+        local require_packagename=""
+        local require_packageversion=""
+        for require_packageNameOrVersion in $REQUIRE_PACKAGES; do
+            if [[ "$flag" == "0" ]]; then
+                flag="1"
+                require_packagename=$require_packageNameOrVersion
+            else
+                flag="0"
+                require_packageversion=$require_packageNameOrVersion
+                echo $require_packagename $require_packageversion > $SETUPPATH/require_packages.txt
+                install $python_status $require_packagename $require_packageversion $targetvenvpath
+            fi
+        done
+    else
+        echo "Not exists require package"
+    fi
 }
 function main {
     local python_status=$1  # Like py3 or py2
