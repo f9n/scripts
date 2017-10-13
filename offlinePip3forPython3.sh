@@ -5,6 +5,7 @@ declare -A ALL_SITE_PACKAGES_PATHS=(
     ["py3"]=""
 )
 declare -a InitialFiles=("")
+REQUIRE_PACKAGES=""
 IS_DEBUG="FALSE"
 SETUPPATH="$HOME/offlinepip3"
 
@@ -65,14 +66,18 @@ function get_require_packages() {
     local package_dist_info_path=$1 # Example data: /home/<user_name>venv/lib/python3.6/site-packages/Flask-0.12.2.dist-info
     # There is metadata.json in every "*dist.info" directory. And metadata.json file keep require packages.
     echo $package_dist_info_path
-    require_packages=$(cat $package_dist_info_path/metadata.json | python3 -c "import sys, json; print(*json.load(sys.stdin)['run_requires'][0]['requires'])")
-    echo $require_packages      # Jinja2 (>=2.4) Werkzeug (>=0.7) click (>=2.0) itsdangerous (>=0.21)
+    # control, 'run_requires' key.
+    # "run_requires": [{"requires": ["Babel (>=0.8)"], "extra": "i18n"}, {"requires": ["MarkupSafe (>=0.23)"]}]
+    # then, i have just markupsafe
+    REQUIRE_PACKAGES=$(cat $package_dist_info_path/metadata.json | python3 -c "import sys, json; print(*json.load(sys.stdin)['run_requires'][0]['requires'])")
 }
 
 function install {
     # installing package
-    local package_name=$1
-    local python_version=$2
+    local python_status=$1
+    local package_name=$2
+    local package_version=$3
+    local targetvenvpath=$4
     local package_dist_info=""
     local package_dist_info_path=""
     check_is_debug_mode "install() package_name: $package_name python_version: $python_version"
@@ -100,14 +105,16 @@ function install {
     #       Flask-0.12.2.dist-info /home/<user_name>/github/heyiya/venv/lib/python3.6/site-packages/Flask-0.12.2.dist-info
     #       Flask-0.12.2.dist-info /home/<user_name>/venv/lib/python3.6/site-packages/Flask-0.12.2.dist-info
     # After that, we are finding big one.
-    for lineno in $( awk '{ print NR, $1}' $SETUPPATH/packagelist_${python_version}.txt |\
+    for lineno in $( awk '{ print NR, $1}' $SETUPPATH/packagelist_${python_status}.txt |\
                     grep -i "$package_name[-_][0-9.]*\.dist-info" |\
                     awk '{ print $1 }'); do
-        sed "${lineno}q;d" $SETUPPATH/packagelist_${python_version}.txt >> $SETUPPATH/result_package_path.txt
+        sed "${lineno}q;d" $SETUPPATH/packagelist_${python_status}.txt >> $SETUPPATH/result_package_path.txt
         #awk -v n=$lineno 'NR == n' $SETUPPATH/packagelist_${python_version}.txt >> $SETUPPATH/result_package_path.txt
     done
+    # Control, "result_package_path.txt"
     read -r package_dist_info package_dist_info_path <<< $(cat $SETUPPATH/result_package_path.txt | sort -r | head -n 1)
     get_require_packages $package_dist_info_path
+    echo $REQUIRE_PACKAGES # Jinja2 (>=2.4) Werkzeug (>=0.7) click (>=2.0) itsdangerous (>=0.21)
 }
 function main {
     local python_status=$1  # Like py3 or py2
@@ -118,7 +125,7 @@ function main {
     [[ $debug = "--debug" ]] && IS_DEBUG="TRUE"
     [ ! -e $SETUPPATH ] && mkdir $SETUPPATH && check_is_debug_mode "created $SETUPPATH"
     rm $SETUPPATH/packagelist_py2.txt $SETUPPATH/packagelist_py3.txt 2> /dev/null
-    rm $SETUPPATH/result_package_path.txt
+    rm $SETUPPATH/result_package_path.txt 2> /dev/null
     rm -r $SETUPPATH/venv 2> /dev/null
     
     init
@@ -126,7 +133,7 @@ function main {
     read_init_files
     check_is_debug_mode ${InitialFiles[@]}
     read_all_package_path $python_status
-    install $package_name $python_status
+    install $python_status $package_name "" $my_venv_path
 }
 
 main "$@"
